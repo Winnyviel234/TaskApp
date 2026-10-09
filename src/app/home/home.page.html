@@ -1,0 +1,493 @@
+<ion-header class="app-header">
+  <ion-toolbar>
+    <div class="brand">
+      <div class="brand-logo">T</div>
+
+      <div class="brand-copy">
+        <ion-title>Task<span>App</span></ion-title>
+        <span class="brand-caption">PERSONAL TASK SYSTEM</span>
+      </div>
+
+      <div class="status-pill">
+        <span class="status-dot"></span>
+        ONLINE
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="task-content">
+  <main class="dashboard">
+
+    <section class="hero glass-panel">
+      <div class="hero-glow"></div>
+
+      <div class="eyebrow">
+        <span class="eyebrow-line"></span>
+        TU ESPACIO DE PRODUCTIVIDAD
+      </div>
+
+      <h1>
+        Organiza tu día.<br>
+        <span>Domina tus metas.</span>
+      </h1>
+
+      <p class="hero-description">
+        Cada tarea completada te acerca a tu siguiente objetivo.
+      </p>
+
+      <div class="hero-bottom">
+        <div class="task-counter">
+          <span class="counter-label">TAREAS REGISTRADAS</span>
+          <strong>{{ tareas.length }}</strong>
+        </div>
+
+        <div class="hero-decoration" aria-hidden="true">
+          <span class="deco-ring ring-one"></span>
+          <span class="deco-ring ring-two"></span>
+          <span class="deco-center"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- DASHBOARD DE ESTADÍSTICAS -->
+    <section class="stats-grid">
+      <article class="stat-card">
+        <div class="stat-icon purple-icon">◈</div>
+        <span class="stat-label">TOTAL</span>
+        <strong>{{ tareas.length }}</strong>
+        <span class="stat-caption">Registradas</span>
+      </article>
+
+      <article class="stat-card pending-card">
+        <div class="stat-icon amber-icon">◷</div>
+        <span class="stat-label">PENDIENTES</span>
+        <strong>{{ tareasPendientes }}</strong>
+        <span class="stat-caption">Por completar</span>
+      </article>
+
+      <article class="stat-card completed-card">
+        <div class="stat-icon cyan-icon">✓</div>
+        <span class="stat-label">COMPLETADAS</span>
+        <strong>{{ tareasCompletadas }}</strong>
+        <span class="stat-caption">Finalizadas</span>
+      </article>
+
+      <article class="stat-card overdue-card">
+        <div class="stat-icon red-icon">!</div>
+        <span class="stat-label">VENCIDAS</span>
+        <strong>{{ tareasVencidas }}</strong>
+        <span class="stat-caption">Fuera de plazo</span>
+      </article>
+    </section>
+
+    <!-- PROGRESO CIRCULAR -->
+    <section class="progress-card glass-panel">
+      <div class="progress-copy">
+        <div class="section-kicker">ANÁLISIS / 01</div>
+        <h2>Tu progreso</h2>
+
+        <p>
+          {{ tareas.length === 0
+            ? 'Tu siguiente logro empieza con una tarea.'
+            : progreso === 100
+              ? '¡Excelente! Completaste todas tus tareas.'
+              : 'Sigue avanzando. Cada paso cuenta.' }}
+        </p>
+
+        <div class="progress-legend">
+          <span class="legend-dot completed-dot"></span>
+          <span>Completadas</span>
+          <strong>{{ tareasCompletadas }}</strong>
+        </div>
+
+        <div class="progress-legend">
+          <span class="legend-dot pending-dot"></span>
+          <span>Pendientes</span>
+          <strong>{{ tareasPendientes }}</strong>
+        </div>
+      </div>
+
+      <div
+        class="circular-progress"
+        [style.--progress]="progreso + '%'"
+        role="progressbar"
+        [attr.aria-valuenow]="progreso"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-label="Porcentaje de tareas completadas">
+
+        <div class="progress-inner">
+          <strong>{{ progreso }}<span>%</span></strong>
+          <small>COMPLETADO</small>
+        </div>
+      </div>
+    </section>
+
+    <!-- ENCABEZADO DE TAREAS -->
+    <section class="section-heading">
+      <div>
+        <div class="section-kicker">WORKSPACE / 02</div>
+        <h2>Mis tareas<span class="heading-dot">.</span></h2>
+        <p>Tu próximo logro empieza aquí.</p>
+      </div>
+
+      <div class="task-count-badge">
+        {{ tareasFiltradas.length }} RESULTADOS
+      </div>
+    </section>
+
+    <!-- BÚSQUEDA -->
+    <div class="search-container">
+      <ion-searchbar
+        class="task-search"
+        placeholder="Buscar por título o descripción..."
+        aria-label="Buscar tareas"
+        [debounce]="150"
+        (ionInput)="buscarTareas($event)">
+      </ion-searchbar>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="filter-row">
+      <button
+        type="button"
+        class="filter-button"
+        [class.active]="filtroActual === 'Todas'"
+        (click)="cambiarFiltro('Todas')">
+        Todas <span>{{ tareas.length }}</span>
+      </button>
+
+      <button
+        type="button"
+        class="filter-button"
+        [class.active]="filtroActual === 'Pendientes'"
+        (click)="cambiarFiltro('Pendientes')">
+        Pendientes <span>{{ tareasPendientes }}</span>
+      </button>
+
+      <button
+        type="button"
+        class="filter-button"
+        [class.active]="filtroActual === 'Completadas'"
+        (click)="cambiarFiltro('Completadas')">
+        Completadas <span>{{ tareasCompletadas }}</span>
+      </button>
+    </div>
+
+    <!-- MENSAJE DE CONFIRMACIÓN -->
+    <div class="success-message" *ngIf="mensaje" role="status">
+      <ion-icon name="checkmark-circle"></ion-icon>
+      <span>{{ mensaje }}</span>
+
+      <button
+        type="button"
+        (click)="mensaje = ''"
+        aria-label="Cerrar mensaje">
+        ×
+      </button>
+    </div>
+
+    <!-- LISTA DE TAREAS -->
+    <div
+      class="task-list"
+      *ngIf="tareasFiltradas.length > 0; else listaVacia">
+
+      <ion-list>
+        <ion-item
+          *ngFor="let tarea of tareasFiltradas"
+          class="task-item"
+          [class.task-completed]="tarea.completada"
+          lines="none">
+
+          <ion-checkbox
+            slot="start"
+            class="task-checkbox"
+            [checked]="tarea.completada"
+            (ionChange)="cambiarEstado(tarea.id)"
+            [attr.aria-label]="'Completar ' + tarea.titulo">
+          </ion-checkbox>
+
+          <ion-label class="task-label">
+            <div class="task-topline">
+              <span class="task-id">
+                TASK-{{ tarea.id < 10 ? '00' + tarea.id : tarea.id }}
+              </span>
+
+              <ion-badge
+                class="priority-badge"
+                [class.priority-high]="tarea.prioridad === 'Alta'"
+                [class.priority-medium]="tarea.prioridad === 'Media'"
+                [class.priority-low]="tarea.prioridad === 'Baja'">
+                <span class="priority-dot"></span>
+                {{ tarea.prioridad }}
+              </ion-badge>
+            </div>
+
+            <h3 [class.completada]="tarea.completada">
+              {{ tarea.titulo }}
+            </h3>
+
+            <p class="task-description">
+              {{ tarea.descripcion || 'Sin descripción adicional.' }}
+            </p>
+
+                          
+              <div class="task-deadline" *ngIf="tarea.fechaLimite">
+                <div class="deadline-date">
+                  <ion-icon name="calendar-outline"></ion-icon>
+                  <span>Vence: {{ tarea.fechaLimite }}</span>
+                </div>
+
+                <ion-badge
+                  *ngIf="!tarea.completada"
+                  class="deadline-badge"
+                  [class.deadline-overdue]="diasRestantes(tarea.fechaLimite) !== null && diasRestantes(tarea.fechaLimite)! < 0"
+                  [class.deadline-today]="diasRestantes(tarea.fechaLimite) === 0">
+                  {{ textoPlazo(tarea.fechaLimite) }}
+                </ion-badge>
+              </div>
+
+            <div
+              class="task-status"
+              [class.done-status]="tarea.completada">
+
+              <span class="status-dot"></span>
+              {{ tarea.completada ? 'COMPLETADA' : 'EN PROGRESO' }}
+            </div>
+          </ion-label>
+
+          <div class="task-actions" slot="end">
+            <ion-button
+              fill="clear"
+              class="edit-button"
+              (click)="abrirEdicion(tarea)"
+              [attr.aria-label]="'Editar ' + tarea.titulo">
+              <ion-icon name="create"></ion-icon>
+            </ion-button>
+
+            <ion-button
+              fill="clear"
+              class="delete-button"
+              (click)="eliminarTarea(tarea.id)"
+              [attr.aria-label]="'Eliminar ' + tarea.titulo">
+              <ion-icon name="trash"></ion-icon>
+            </ion-button>
+          </div>
+
+        </ion-item>
+      </ion-list>
+    </div>
+
+    <!-- ESTADO VACÍO -->
+    <ng-template #listaVacia>
+      <section class="empty-state glass-panel" *ngIf="tareas.length === 0">
+        <div class="empty-orbit">
+          <div class="empty-icon">
+            <ion-icon name="add"></ion-icon>
+          </div>
+        </div>
+
+        <div class="empty-code">SYSTEM / WAITING FOR INPUT</div>
+        <h3>Tu próxima misión te espera.</h3>
+
+        <p>
+          Tu espacio está listo. Crea tu primera tarea y comienza
+          a organizar tus objetivos.
+        </p>
+
+        <ion-button
+          class="empty-create-button"
+          (click)="abrirFormulario()">
+          <ion-icon slot="start" name="add"></ion-icon>
+          Crear primera tarea
+        </ion-button>
+      </section>
+
+      <section class="empty-state glass-panel" *ngIf="tareas.length > 0">
+        <div class="empty-orbit">
+          <div class="empty-icon search-icon">⌕</div>
+        </div>
+
+        <div class="empty-code">SYSTEM / NO MATCHES</div>
+        <h3>No encontramos tareas.</h3>
+
+        <p>
+          Prueba otra búsqueda o cambia el filtro seleccionado.
+        </p>
+
+        <ion-button
+          fill="clear"
+          (click)="limpiarBusqueda(); cambiarFiltro('Todas')">
+          Limpiar búsqueda y filtros
+        </ion-button>
+      </section>
+    </ng-template>
+
+    <section class="bottom-note">
+      <span class="note-indicator"></span>
+      <span>TUS METAS, TU RITMO.</span>
+      <span class="note-version">TASKAPP / 03.0</span>
+    </section>
+
+  </main>
+</ion-content>
+
+<!-- BOTÓN FLOTANTE -->
+<ion-fab
+  class="task-fab"
+  vertical="bottom"
+  horizontal="end"
+  slot="fixed">
+
+  <ion-fab-button
+    class="add-task-button"
+    (click)="abrirFormulario()"
+    aria-label="Agregar tarea">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+
+<!-- MODAL DE CREACIÓN Y EDICIÓN -->
+<ion-modal
+  class="task-modal"
+  [isOpen]="mostrarFormulario"
+  (didDismiss)="cerrarFormulario()">
+
+  <ng-template>
+    <ion-header class="modal-header">
+      <ion-toolbar>
+        <ion-title>
+          <span class="modal-kicker">TASK ENTRY / 01</span>
+          {{ idTareaEditando !== null ? 'Editar tarea' : 'Nueva tarea' }}
+        </ion-title>
+
+        <ion-buttons slot="end">
+          <ion-button
+            fill="clear"
+            class="modal-close"
+            (click)="cerrarFormulario()"
+            aria-label="Cerrar formulario">
+            <ion-icon name="close"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="modal-content ion-padding">
+      <div class="form-intro">
+        <div class="form-orb">
+          <ion-icon name="add"></ion-icon>
+        </div>
+
+        <p>
+          {{ idTareaEditando !== null
+            ? 'Actualiza los detalles de tu tarea.'
+            : 'Configura tu próximo objetivo.' }}
+        </p>
+      </div>
+
+      <form [formGroup]="formulario" (ngSubmit)="guardarTarea()">
+
+        <div class="field-heading">
+          <span>01</span>
+          <label for="task-title">Título de la tarea</label>
+        </div>
+
+        <ion-item class="form-field" lines="none">
+          <ion-input
+            id="task-title"
+            label="Título"
+            labelPlacement="stacked"
+            placeholder="Ej. Resolver ejercicios"
+            formControlName="titulo">
+          </ion-input>
+        </ion-item>
+
+        <ion-text
+          color="danger"
+          *ngIf="formulario.controls.titulo.touched &&
+                 formulario.controls.titulo.hasError('required')">
+          <p class="validation-message">El título es obligatorio.</p>
+        </ion-text>
+
+        <ion-text
+          color="danger"
+          *ngIf="formulario.controls.titulo.touched &&
+                 formulario.controls.titulo.hasError('minlength')">
+          <p class="validation-message">
+            El título debe tener al menos 5 caracteres.
+          </p>
+        </ion-text>
+
+        <div class="field-heading">
+          <span>02</span>
+          <label for="task-description">Descripción</label>
+        </div>
+
+        <ion-item class="form-field" lines="none">
+          <ion-textarea
+            id="task-description"
+            label="Detalles"
+            labelPlacement="stacked"
+            placeholder="¿Qué tienes que hacer?"
+            formControlName="descripcion"
+            [autoGrow]="true">
+          </ion-textarea>
+        </ion-item>
+
+        <div class="field-heading">
+          <span>03</span>
+          <label for="task-priority">Nivel de prioridad</label>
+        </div>
+
+        <ion-item class="form-field" lines="none">
+          <ion-select
+            id="task-priority"
+            label="Prioridad"
+            labelPlacement="stacked"
+            interface="popover"
+            formControlName="prioridad">
+
+            <ion-select-option value="Alta">Alta</ion-select-option>
+            <ion-select-option value="Media">Media</ion-select-option>
+            <ion-select-option value="Baja">Baja</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <!-- FECHA LÍMITE -->
+        <div class="field-heading">
+          <span>04</span>
+          <label for="fechaLimite">Fecha límite</label>
+        </div>
+
+        <ion-item class="form-field" lines="none">
+          <ion-input
+            id="fechaLimite"
+            type="date"
+            formControlName="fechaLimite">
+          </ion-input>
+        </ion-item>
+
+        <ion-button
+          expand="block"
+          type="submit"
+          class="save-task-button">
+          {{ idTareaEditando !== null ? 'GUARDAR CAMBIOS' : 'GUARDAR TAREA' }}
+          <ion-icon slot="end" name="add"></ion-icon>
+        </ion-button>
+
+        <p class="form-footnote">TASKAPP SYSTEM · NUEVO REGISTRO</p>
+      </form>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<ion-footer class="app-footer">
+  <ion-toolbar>
+    <div class="footer-content">
+      <span><span class="footer-dot"></span> SYSTEM ACTIVE</span>
+      <span>BUILT TO FOCUS.</span>
+    </div>
+  </ion-toolbar>
+</ion-footer>

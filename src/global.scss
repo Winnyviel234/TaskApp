@@ -1,0 +1,105 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/**
+ * Ionic Dark Mode
+ * -----------------------------------------------------
+ * For more info, please see:
+ * https://ionicframework.com/docs/theming/dark-mode
+ */
+
+/* @import "@ionic/angular/css/palettes/dark.always.css"; */
+/* @import "@ionic/angular/css/palettes/dark.class.css"; */
+@import '@ionic/angular/css/palettes/dark.system.css';
+
+
+/* TASKAPP: estilos globales del modal futurista */
+ion-modal.task-modal {
+  --width: min(92%, 500px);
+  --height: 88%;
+  --max-height: 760px;
+  --border-radius: 23px;
+  --background: #0c0c19;
+  --box-shadow: 0 0 60px rgba(139, 92, 246, 0.2);
+
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  border-radius: 23px;
+}
+
+ion-modal.task-modal::part(backdrop) {
+  background: #03030a;
+  opacity: 0.82;
+}
+
+ion-modal.task-modal ion-header.modal-header ion-toolbar {
+  --background: #10101f;
+  --color: #f3f1ff;
+  --border-color: rgba(167, 139, 250, 0.17);
+  border-bottom: 1px solid rgba(167, 139, 250, 0.17);
+  padding: 9px 5px;
+}
+
+ion-modal.task-modal ion-title {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+ion-modal.task-modal .modal-kicker {
+  display: block;
+  color: #67e8f9;
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  font-weight: 800;
+}
+
+ion-modal.task-modal .modal-close {
+  --color: #a7a4c1;
+}
+
+ion-modal.task-modal ion-content.modal-content {
+  --background: #0c0c19;
+  --color: #f3f1ff;
+}
+
+ion-modal.task-modal ion-item.form-field::part(native) {
+  border-radius: 13px;
+}
+
+ion-modal.task-modal ion-select-popover,
+ion-popover {
+  --background: #151528;
+  --color: #f3f1ff;
+}
+
+ion-modal.task-modal ion-select-popover ion-item,
+ion-popover ion-item {
+  --background: #151528;
+  --color: #f3f1ff;
+}
