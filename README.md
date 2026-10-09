@@ -11,6 +11,7 @@ Este proyecto se desarrolló como práctica académica para aplicar
 componentes de Ionic, formularios reactivos de Angular, modelos
 TypeScript, servicios y almacenamiento local del navegador.
 
+
 ## Tabla de contenidos
 
 -   [Descripción del proyecto](#descripción-del-proyecto)
@@ -162,10 +163,8 @@ de npm y los permisos de instalación.
 Clona el repositorio de GitHub:
 
 ``` bash
-git clone URL_DEL_REPOSITORIO
-```
-
-Sustituye `URL_DEL_REPOSITORIO` por la dirección real del repositorio.
+git clone https://github.com/Winnyviel234/TaskApp.git
+``` 
 
 Después, entra en la carpeta del proyecto. Por ejemplo, si la carpeta se
 llama `TaskApp`:
